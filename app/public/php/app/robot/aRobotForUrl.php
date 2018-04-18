@@ -10,6 +10,7 @@ abstract class aRobotForUrl extends aRobot
     protected $headers;
     protected $url;
     protected $robotContent;
+    protected $statusCode;
 
 
     public function __construct($url)
@@ -47,5 +48,13 @@ abstract class aRobotForUrl extends aRobot
         return self::NO_STATUS_HEADER;
     }
 
-
+    protected function getHeaderWithLength()
+    {
+        foreach ($this->headers as $header) {
+            if (strpos($header, 'Content-Length:') !== false) {
+                return $header;
+            }
+        }
+        return '';
+    }
 }

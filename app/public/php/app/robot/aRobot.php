@@ -16,4 +16,10 @@ abstract class aRobot
         $parts = explode(' ', trim($header));
         return (int)$parts[1];
     }
+
+    protected function getSize($header, $content)
+    {
+        return strpos('Content-Length:', $header) !== false ? str_replace('Content-Length:', '', trim($header)) :
+            strlen(trim($content));
+    }
 }

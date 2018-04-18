@@ -14,7 +14,8 @@ class Robot extends RobotForUrl implements iRobot
         if ($this->robotContent == '') {
             return $this;
         }
-
+        $headerLength = $this->getHeaderWithLength();
+        $this->checkLength($headerLength, $this->robotContent);
         return $this;
     }
 

@@ -4,7 +4,7 @@ namespace App\Robot;
 
 class RobotForUrl extends aRobotForUrl
 {
-    protected $rules = ['statusCode' => 200];
+    protected $rules = ['statusCode' => 200, 'length' => 32000];
     protected $headerStatus;
     protected $result = [];
     protected $availableResults = [
@@ -15,10 +15,24 @@ class RobotForUrl extends aRobotForUrl
                 'recommendation' => 'Программист: Файл robots.txt должны отдавать код ответа 200, иначе файл не будет 
                 обрабатываться. Необходимо настроить сайт таким образом, чтобы при обращении к файлу robots.txt сервер 
                 возвращает код ответа 200'],
+        ],
+        'robot' => [
+            'ok' => ['state' => 'Файл robots.txt присутствует', 'recommendation' => 'Доработки не требуются'],
+            'error' => ['state' => 'Файл robots.txt отсутствует',
+                'recommendation' => 'Программист: Создать файл robots.txt и разместить его на сайте'],
+        ],
+        'length' => [
+            'ok' => ['state' => 'Размер файла robots.txt составляет __, что находится в пределах допустимой нормы',
+                'recommendation' => 'Доработки не требуются'],
+            'error' => ['state' => 'Размера файла robots.txt составляет __, что превышает допустимую норму',
+                'recommendation' => 'Программист: Максимально допустимый размер файла robots.txt составляем 32 кб. 
+                Необходимо отредактировть файл robots.txt таким образом, чтобы его размер не превышал 32 Кб'],
         ]
     ];
     protected $tests = [
         1 => 'Проверка наличия файла robots.txt',
+        10 => 'Проверка размера файла robots.txt',
+        12 => 'Проверка кода ответа сервера для файла robots.txt'
     ];
 
 
@@ -55,6 +69,20 @@ class RobotForUrl extends aRobotForUrl
         return $this;
     }
 
+    protected function checkLength($header, $content)
+    {
+        $length = $this->getSize($header, $content);
+        if ($length <= $this->rules['length']) {
+            $this->result['length'] = ['ok' => $this->availableResults['length']['ok']];
+            $this->result['length']['ok']['state'] =
+                str_replace('__', round($length / 1000, 1) . ' кб', $this->result['length']['ok']['state']);
+        } else {
+            $this->result['length'] = ['error' => $this->availableResults['length']['error']];
+            $this->result['length']['error']['state'] =
+                str_replace('__', round($length / 1000, 1) . ' кб', $this->result['length']['error']['state']);
+        }
+    }
+
     protected function formatResult()
     {
         $result = [];
@@ -87,6 +115,20 @@ class RobotForUrl extends aRobotForUrl
                     );
         } else {
             return $result;
+        }
+        if (array_key_exists('length', $this->result)) {
+            $result[10] = ['test' => $this->tests[10]];
+            $result[10] =
+                array_key_exists('ok', $this->result['length']) ?
+                    array_merge($result[10],
+                        ['status' => 'Оk', 'state' => $this->result['length']['ok']['state'],
+                            'recommendation' => $this->result['length']['ok']['recommendation']]
+                    )
+                    :
+                    array_merge($result[10],
+                        ['status' => 'Ошибка', 'state' => $this->result['length']['error']['state'],
+                            'recommendation' => $this->result['length']['error']['recommendation']]
+                    );
         }
 
         return $result;
