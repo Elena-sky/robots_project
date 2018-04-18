@@ -4,7 +4,7 @@ namespace App\Robot;
 
 class RobotForUrl extends aRobotForUrl
 {
-    protected $rules = ['statusCode' => 200, 'length' => 32000, 'directives' => ['Host']];
+    protected $rules = ['statusCode' => 200, 'length' => 32000, 'directives' => ['Host', 'Sitemap']];
     protected $headerStatus;
     protected $result = [];
     protected $availableResults = [
@@ -47,7 +47,12 @@ class RobotForUrl extends aRobotForUrl
                         Необходимо удалить все дополнительные директивы Host и оставить только 1, корректную и 
                         соответствующую основному зеркалу сайта']
                 ]
-            ]
+            ],
+            'Sitemap' => [[
+                'ok' => ['state' => 'Директива Sitemap указана',
+                    'recommendation' => 'Доработки не требуются'],
+                'error' => ['state' => 'В файле robots.txt не указана директива Sitemap',
+                    'recommendation' => 'Программист: Добавить в файл robots.txt директиву Sitemap']]]
         ]
     ];
     protected $tests = [
@@ -55,6 +60,7 @@ class RobotForUrl extends aRobotForUrl
         6 => 'Проверка указания директивы Host',
         8 => 'Проверка количества директив Host, прописанных в файле',
         10 => 'Проверка размера файла robots.txt',
+        11 => 'Проверка указания директивы Sitemap',
         12 => 'Проверка кода ответа сервера для файла robots.txt'
     ];
 
@@ -205,6 +211,20 @@ class RobotForUrl extends aRobotForUrl
                     array_merge($result[8],
                         ['status' => 'Ошибка', 'state' => $this->result['Host']['number']['error']['state'],
                             'recommendation' => $this->result['Host']['number']['error']['recommendation']]
+                    );
+        }
+        if (array_key_exists('Sitemap', $this->result)) {
+            $result[11] = ['test' => $this->tests[11]];
+            $result[11] =
+                array_key_exists('ok', $this->result['Sitemap']['presence']) ?
+                    array_merge($result[11],
+                        ['status' => 'Оk', 'state' => $this->result['Sitemap']['presence']['ok']['state'],
+                            'recommendation' => $this->result['Sitemap']['presence']['ok']['recommendation']]
+                    )
+                    :
+                    array_merge($result[11],
+                        ['status' => 'Ошибка', 'state' => $this->result['Sitemap']['presence']['error']['state'],
+                            'recommendation' => $this->result['Sitemap']['presence']['error']['recommendation']]
                     );
         }
 
