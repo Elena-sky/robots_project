@@ -16,12 +16,8 @@ class Robot extends RobotForUrl implements iRobot
         }
         $headerLength = $this->getHeaderWithLength();
         $this->checkLength($headerLength, $this->robotContent);
+        $this->checkDirectives($this->robotContent);
         return $this;
-    }
-
-    protected function getRobot()
-    {
-        // TODO: Implement getRobot() method.
     }
 
     public function getResults()

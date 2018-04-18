@@ -13,6 +13,7 @@ abstract class aRobot
 
     abstract protected function checkLength($header, $content);
 
+    abstract protected function checkDirectives($content);
 
     protected function getStatusCode($header)
     {
@@ -24,5 +25,10 @@ abstract class aRobot
     {
         return strpos('Content-Length:', $header) !== false ? str_replace('Content-Length:', '', trim($header)) :
             strlen(trim($content));
+    }
+
+    protected function getCount($directive, $string)
+    {
+        return substr_count($string, $directive);
     }
 }

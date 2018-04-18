@@ -4,7 +4,7 @@ namespace App\Robot;
 
 class RobotForUrl extends aRobotForUrl
 {
-    protected $rules = ['statusCode' => 200, 'length' => 32000];
+    protected $rules = ['statusCode' => 200, 'length' => 32000, 'directives' => ['Host']];
     protected $headerStatus;
     protected $result = [];
     protected $availableResults = [
@@ -27,10 +27,33 @@ class RobotForUrl extends aRobotForUrl
             'error' => ['state' => 'Размера файла robots.txt составляет __, что превышает допустимую норму',
                 'recommendation' => 'Программист: Максимально допустимый размер файла robots.txt составляем 32 кб. 
                 Необходимо отредактировть файл robots.txt таким образом, чтобы его размер не превышал 32 Кб'],
+        ],
+        'directives' => [
+            'Host' => [
+                [
+                    'ok' => ['state' => 'Директива Host указана',
+                        'recommendation' => 'Доработки не требуются'],
+                    'error' => ['state' => 'В файле robots.txt не указана директива Host',
+                        'recommendation' => 'Программист: Для того, чтобы поисковые системы знали, какая версия сайта 
+                        является основных зеркалом, необходимо прописать адрес основного зеркала в директиве Host. В 
+                        данный момент это не прописано. Необходимо добавить в файл robots.txt директиву Host. Директива 
+                        Host задётся в файле 1 раз, после всех правил.']
+                ],
+                [
+                    'ok' => ['state' => 'В файле прописана 1 директива Host',
+                        'recommendation' => 'Доработки не требуются'],
+                    'error' => ['state' => 'В файле прописано несколько директив Host',
+                        'recommendation' => 'Программист: Директива Host должна быть указана в файле толоко 1 раз. 
+                        Необходимо удалить все дополнительные директивы Host и оставить только 1, корректную и 
+                        соответствующую основному зеркалу сайта']
+                ]
+            ]
         ]
     ];
     protected $tests = [
         1 => 'Проверка наличия файла robots.txt',
+        6 => 'Проверка указания директивы Host',
+        8 => 'Проверка количества директив Host, прописанных в файле',
         10 => 'Проверка размера файла robots.txt',
         12 => 'Проверка кода ответа сервера для файла robots.txt'
     ];
@@ -83,6 +106,32 @@ class RobotForUrl extends aRobotForUrl
         }
     }
 
+    protected function checkDirectives($content)
+    {
+        foreach ($this->rules['directives'] as $directive) {
+            $number = $this->getCount($directive, $content);
+            if ($number > 0) {
+                $this->result[$directive] =
+                    ['presence' => ['ok' => $this->availableResults['directives'][$directive][0]['ok']]];
+                if ($directive == 'Host') {
+                    if ($number == 1) {
+                        $this->result[$directive] =
+                            array_merge($this->result[$directive], ['number' => ['ok' =>
+                                $this->availableResults['directives'][$directive][1]['ok']]]);
+                    } else {
+                        $this->result[$directive] =
+                            array_merge($this->result[$directive], ['number' => ['error' =>
+                                $this->availableResults['directives'][$directive][1]['error']]]);
+                    }
+                }
+            } else {
+                $this->result[$directive] =
+                    ['presence' => ['error' => $this->availableResults['directives'][$directive][0]['error']]];
+            }
+        }
+        return $this;
+    }
+
     protected function formatResult()
     {
         $result = [];
@@ -128,6 +177,34 @@ class RobotForUrl extends aRobotForUrl
                     array_merge($result[10],
                         ['status' => 'Ошибка', 'state' => $this->result['length']['error']['state'],
                             'recommendation' => $this->result['length']['error']['recommendation']]
+                    );
+        }
+        if (array_key_exists('Host', $this->result)) {
+            $result[6] = ['test' => $this->tests[6]];
+            $result[6] =
+                array_key_exists('ok', $this->result['Host']['presence']) ?
+                    array_merge($result[6],
+                        ['status' => 'Оk', 'state' => $this->result['Host']['presence']['ok']['state'],
+                            'recommendation' => $this->result['Host']['presence']['ok']['recommendation']]
+                    )
+                    :
+                    array_merge($result[6],
+                        ['status' => 'Ошибка', 'state' => $this->result['Host']['presence']['error']['state'],
+                            'recommendation' => $this->result['Host']['presence']['error']['recommendation']]
+                    );
+        }
+        if (array_key_exists('Host', $this->result) && array_key_exists('number', $this->result['Host'])) {
+            $result[8] = ['test' => $this->tests[8]];
+            $result[8] =
+                array_key_exists('ok', $this->result['Host']['number']) ?
+                    array_merge($result[8],
+                        ['status' => 'Оk', 'state' => $this->result['Host']['number']['ok']['state'],
+                            'recommendation' => $this->result['Host']['number']['ok']['recommendation']]
+                    )
+                    :
+                    array_merge($result[8],
+                        ['status' => 'Ошибка', 'state' => $this->result['Host']['number']['error']['state'],
+                            'recommendation' => $this->result['Host']['number']['error']['recommendation']]
                     );
         }
 
