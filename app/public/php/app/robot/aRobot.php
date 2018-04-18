@@ -11,6 +11,9 @@ abstract class aRobot
 
     abstract protected function checkStatusCode($header);
 
+    abstract protected function checkLength($header, $content);
+
+
     protected function getStatusCode($header)
     {
         $parts = explode(' ', trim($header));
