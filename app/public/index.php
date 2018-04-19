@@ -9,7 +9,7 @@ Loader::load('robot/aRobotForUrl.php');
 Loader::load('robot/RobotForUrl.php');
 Loader::load('robot/iRobot.php');
 Loader::load('robot/Robot.php');
-Loader::load('table/table.php');
+Loader::load('table/Table.php');
 
 
 $result=[];
