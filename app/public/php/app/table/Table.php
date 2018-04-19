@@ -5,11 +5,12 @@ namespace App\Table;
     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
     use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 
-    class table
+    class Table
     {
         protected $result;
+        public $fileName;
 
-        public function setResult($result)
+        public function __construct($result)
         {
             $this->result = $result;
         }
@@ -45,9 +46,10 @@ namespace App\Table;
                 $i++;
             }
 
+            $this->fileName = 'robotsTest'.rand(1,1212).'.xlsx';
+
             $writer = new Xlsx($table);
-            $name = 'robotsTest'.rand(1,1212).'.xlsx';
-            $writer->save($name);
+            $writer->save($this->fileName);
         }
 
     }

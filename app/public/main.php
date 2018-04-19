@@ -36,7 +36,7 @@
         </form>
 
         <div class="container">
-            <?php if($result != []){ ?>
+            <?php if(!empty($result)){ ?>
                 <table class="table table-bordered">
                     <tr>
                         <th>№</th>
@@ -60,7 +60,11 @@
                         <td><?php echo $v['recommendation']; } ?></td>
                     </tr>
                 </table>
+
+                <a href="http://robot.loc/<?=$file?>" download><button type="button" class="btn btn-primary">Скачать</button></a>
+
             <?php } ?>
+
         </div>
 
     </div>

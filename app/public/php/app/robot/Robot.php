@@ -4,6 +4,7 @@ namespace App\Robot;
 
 class Robot extends RobotForUrl implements iRobot
 {
+    private $src;
 
     public function check()
     {
@@ -22,8 +23,8 @@ class Robot extends RobotForUrl implements iRobot
 
     public function getResults()
     {
-        return $this->formatResult();
+        $this->src = $this->formatResult();
+        return $this->src;
     }
-
 
 }

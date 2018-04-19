@@ -17,9 +17,9 @@ if(array_key_exists('url', $_POST)){
     $robot = new \App\Robot\Robot($_POST['url']);
     $result = $robot->check()->getResults();
 
-    $table = new \App\Table\Table();
-    $table->setResult($result);
+    $table = new \App\Table\Table($result);
     $table->createTable();
+    $file = $table->fileName;
     ksort($result);
 }
 
