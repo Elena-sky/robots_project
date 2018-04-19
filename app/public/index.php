@@ -1,5 +1,5 @@
 <?php
-require '../../vendor/autoload.php';
+require './vendor/autoload.php';
 require_once ('./php/loader/Loader.php');
 Loader::load('app.php');
 Loader::load('url/UrlInterface.php');
