@@ -61,7 +61,7 @@
                     </tr>
                 </table>
 
-                <a href="http://robot.loc/<?=$file?>" download><button type="button" class="btn btn-primary">Скачать</button></a>
+                <a href="https://robotsproject.herokuapp.com/<?=$file?>" download><button type="button" class="btn btn-primary">Скачать</button></a>
 
             <?php } ?>
 
