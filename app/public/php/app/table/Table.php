@@ -3,7 +3,6 @@ namespace App\Table;
 
     use PhpOffice\PhpSpreadsheet\Spreadsheet;
     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-    use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 
     class Table
     {
